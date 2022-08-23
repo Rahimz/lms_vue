@@ -120,13 +120,13 @@ export default {
             }
         }
     },
-    mounted() {
+    async mounted() {
         console.log('mounted')
         
         // we get the slug from router
         const slug = this.$route.params.slug
 
-        axios
+        await axios
             // use single back quote to use variables
             .get(`/api/v1/courses/${slug}`)
             .then(response => {
@@ -135,6 +135,9 @@ export default {
                 this.course = response.data.course
                 this.lessons = response.data.lessons
             })
+
+            // to edit page title 
+            document.title = this.course.title + ' | Studynet'
     },
     methods: {
       submitComment() {
