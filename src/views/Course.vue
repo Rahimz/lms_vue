@@ -31,21 +31,57 @@
                   {{ activeLesson.long_description }}
                   <hr>
 
-                  <article 
-                  class="media box"
-                  v-for="comment in comments"
-                  v-bind:key="comment.id">
+                  <template v-if="activeLesson.lesson_type === 'quiz'">
+                    <h3>{{ quiz.question }}</h3>
+                    <div class="control">
+                      <label for="" class="radio">
+                        <input type="radio" :value="quiz.op1" v-model="selectedAnswer"> {{ quiz.op1 }}
+                      </label>
+                    </div>
+                    <div class="control">
+                      <label for="" class="radio">
+                        <input type="radio" :value="quiz.op2" v-model="selectedAnswer"> {{ quiz.op2 }}
+                      </label>
+                    </div>
+                    <div class="control">
+                      <label for="" class="radio">
+                        <input type="radio" :value="quiz.op3" v-model="selectedAnswer"> {{ quiz.op3 }}
+                      </label>
+                    </div>
+                    <div class="control mt-4">
+                      <button class="button is-info" @click="submitQuiz">Submit</button>
+                    </div>
+
+                    <template v-if="quizResult == 'correct'">
+                      <div class="notification is-success mt-4">
+                        Correct :-D
+                      </div>
+                    </template>
+
+                    <template v-if="quizResult == 'incorrect'">
+                      <div class="notification is-danger mt-4">
+                        Not Correct :-( Please try again
+                      </div>
+                    </template>
+                  </template>
+
+                  <template v-if="activeLesson.lesson_type === 'article'">
+                    
+                    <article 
+                    class="media box"
+                    v-for="comment in comments"
+                    v-bind:key="comment.id">
                     <div class="media-content">
                       <div class="content">
                         <p>
                           <strong>{{ comment.name }}</strong> {{ comment.created_at }}
                         </p>
-                          {{ comment.content }}
-
+                        {{ comment.content }}
+                        
                       </div>
                     </div>
                   </article>
-
+                  
                   <form v-on:submit.prevent="submitComment()">
                     <div class="field">
                       <label class="label" for="">Name</label>
@@ -53,32 +89,33 @@
                         <input type="text" class="input" v-model="comment.name">
                       </div>
                     </div>
-
+                    
                     <div class="field">
                       <label class="label" for="">Content</label>
                       <div class="control">
                         <textarea class="textarea" v-model="comment.content"></textarea>
                       </div>
                     </div>
-
+                    
                     <div 
-                      class="notification is-danger"
-                      v-for="error in errors"
-                      v-bind:key="error"
-                      >
-                      {{ error }}
-
+                    class="notification is-danger"
+                    v-for="error in errors"
+                    v-bind:key="error"
+                    >
+                    {{ error }}
+                    
+                  </div>
+                  
+                  <div class="field">
+                    <div class="control">
+                      <button class="button is-link">Submit</button>
                     </div>
-
-                    <div class="field">
-                      <div class="control">
-                        <button class="button is-link">Submit</button>
-                      </div>
-                    </div>  
-
-
-                  </form>
-
+                  </div>  
+                  
+                  
+                </form>
+              </template>
+                
 
               </template>
               <template v-else>
@@ -113,7 +150,10 @@ export default {
             lessons: [],
             comments: [],
             errors: [],
+            quiz: [],
+            selectedAnswer: [],
             activeLesson: null,
+            quizResult: null,
             comment: {
               name: '',
               content: '',
@@ -140,6 +180,20 @@ export default {
             document.title = this.course.title + ' | Studynet'
     },
     methods: {
+      submitQuiz() {
+        this.quizResult = null
+        
+        if (this.selectedAnswer) {
+          if (this.selectedAnswer === this.quiz.answer) {
+            this.quizResult = 'correct'
+          } else {
+            this.quizResult = 'incorrect'
+          }
+
+        }else {
+          alert('Select answer first')
+        }
+      },
       submitComment() {
         console.log('submitComment')
         // in every submit we need to clean this
@@ -170,8 +224,23 @@ export default {
       setActiveLesson(lesson) {
         this.activeLesson = lesson
 
-        this.getComments() 
-      }, getComments() {
+        if (lesson.lesson_type === 'quiz') {
+          this.getQuiz()
+        } else {
+          this.getComents
+        }
+        
+      },
+      getQuiz() {
+        axios
+            .get(`/api/v1/courses/${this.course.slug}/${this.activeLesson.slug}/get-quiz/`)
+            .then(response => {              
+              console.log(response.data)
+
+              this.quiz = response.data
+            })
+      },
+      getComments() {
            axios
             .get(`/api/v1/courses/${this.course.slug}/${this.activeLesson.slug}/get-comments/`)
             .then(response => {
