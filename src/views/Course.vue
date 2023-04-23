@@ -32,37 +32,17 @@
                   <hr>
 
                   <template v-if="activeLesson.lesson_type === 'quiz'">
-                    <h3>{{ quiz.question }}</h3>
-                    <div class="control">
-                      <label for="" class="radio">
-                        <input type="radio" :value="quiz.op1" v-model="selectedAnswer"> {{ quiz.op1 }}
-                      </label>
-                    </div>
-                    <div class="control">
-                      <label for="" class="radio">
-                        <input type="radio" :value="quiz.op2" v-model="selectedAnswer"> {{ quiz.op2 }}
-                      </label>
-                    </div>
-                    <div class="control">
-                      <label for="" class="radio">
-                        <input type="radio" :value="quiz.op3" v-model="selectedAnswer"> {{ quiz.op3 }}
-                      </label>
-                    </div>
-                    <div class="control mt-4">
-                      <button class="button is-info" @click="submitQuiz">Submit</button>
-                    </div>
-
-                    <template v-if="quizResult == 'correct'">
-                      <div class="notification is-success mt-4">
-                        Correct :-D
-                      </div>
-                    </template>
-
-                    <template v-if="quizResult == 'incorrect'">
-                      <div class="notification is-danger mt-4">
-                        Not Correct :-( Please try again
-                      </div>
-                    </template>
+                    <!-- how to use component -->
+                    <Quiz
+                      v-bind:quiz="quiz"
+                    />
+                  </template>
+                  
+                  <template v-if="activeLesson.lesson_type === 'video'">
+                    <!-- how to use component -->
+                    <Video
+                      v-bind:youtube_id="activeLesson.youtube_id"
+                    />
                   </template>
 
                   <template v-if="activeLesson.lesson_type === 'article'">
@@ -110,24 +90,25 @@
 import axios from 'axios'
 
 import CourseComment from '@/components/CourseComment'
-
 import AddComment from '@/components/AddComment.vue'
+import Quiz from '@/components/Quiz.vue'
+import Video from '@/components/Video.vue'
 
 export default {
   components:{
     CourseComment,
-    AddComment, 
+    AddComment,
+    Quiz,
+    Video, 
   }, 
   data() {
       return {
           course: {},
           lessons: [],
+          activeLesson: null,
           comments: [],
           errors: [],
-          quiz: [],
-          selectedAnswer: [],
-          activeLesson: null,
-          quizResult: null,
+          quiz: [],          
           // comment: {
           //   name: '',
           //   content: '',
@@ -142,7 +123,7 @@ export default {
 
       await axios
           // use single back quote to use variables
-          .get(`/api/v1/courses/${slug}`)
+          .get(`courses/${slug}`)
           .then(response => {
               console.log(response.data)
 
@@ -157,22 +138,6 @@ export default {
     submitComment(comment) {
       this.comments.push(comment)
     },
-
-    submitQuiz() {
-      this.quizResult = null
-      
-      if (this.selectedAnswer) {
-        if (this.selectedAnswer === this.quiz.answer) {
-          this.quizResult = 'correct'
-        } else {
-          this.quizResult = 'incorrect'
-        }
-
-      }else {
-        alert('Select answer first')
-      }
-    },
-    
     setActiveLesson(lesson) {
       this.activeLesson = lesson
 
@@ -185,7 +150,7 @@ export default {
     },
     getQuiz() {
       axios
-          .get(`/api/v1/courses/${this.course.slug}/${this.activeLesson.slug}/get-quiz/`)
+          .get(`courses/${this.course.slug}/${this.activeLesson.slug}/get-quiz/`)
           .then(response => {              
             console.log(response.data)
 
@@ -194,7 +159,7 @@ export default {
     },
     getComments() {
           axios
-          .get(`/api/v1/courses/${this.course.slug}/${this.activeLesson.slug}/get-comments/`)
+          .get(`courses/${this.course.slug}/${this.activeLesson.slug}/get-comments/`)
           .then(response => {
             console.log(response.data)
 

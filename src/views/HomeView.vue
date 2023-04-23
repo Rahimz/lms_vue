@@ -75,7 +75,7 @@ export default {
     mounted() {
         console.log("mounted");
         axios
-            .get("/api/v1/courses/get-frontpage-courses/")
+            .get("courses/get-frontpage-courses/")
             
             .then(response => {
               console.log(response.data);

@@ -16,24 +16,31 @@
 import axios from 'axios'
 
 export default {
-    methods: {
-        async logout() {
-            console.log('logout')
+  mounted() {
+    axios 
+    .get('activities/get_active_courses/')
+    .then(response => {
+      console.log(response.data)
+    })
+  },
+  methods: {
+      async logout() {
+          console.log('logout')
 
-            await axios 
-            .post('api/v1/token/logout/')
-            .then(response => {
-              console.log('Logged out')
-            })
-            // reset tokens 
-            axios.defaults.headers.common['Authorization'] = ""
-            // remove token from old sessions
-            localStorage.removeItem('token')
+          await axios 
+          .post('token/logout/')
+          .then(response => {
+            console.log('Logged out')
+          })
+          // reset tokens 
+          axios.defaults.headers.common['Authorization'] = ""
+          // remove token from old sessions
+          localStorage.removeItem('token')
 
-            this.$store.commit('removeToken')
+          this.$store.commit('removeToken')
 
-            this.$router.push('/')
-        }
-    }
+          this.$router.push('/')
+      }
+  }
 }
 </script>

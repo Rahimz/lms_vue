@@ -63,7 +63,7 @@ export default {
 
       if (!this.errors.length) {
         axios
-          .post(`/api/v1/courses/${this.$route.params.slug}/${this.activeLesson.slug}/`, this.comment)
+          .post(`courses/${this.$route.params.slug}/${this.activeLesson.slug}/`, this.comment)
           .then(response => {
             this.comment.name = ""
             this.comment.content = ""
