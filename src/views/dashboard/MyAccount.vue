@@ -2,10 +2,10 @@
   <div class="about">
      <div class="hero is-info">
       <div class="hero-body has-text-centered">
-        <h1 class="title">My account</h1>
-       
-      </div>
+        <h1 class="title">My account</h1>       
+      </div>      
   </div>
+  
     <section class="section">
       <div class="columns is-multiline">
         <div class="column is-12">
